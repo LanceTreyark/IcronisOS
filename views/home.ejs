@@ -2,251 +2,1184 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sentinel FPV</title>
-  <style>
-    @import url('/resources/BigShouldersStencil-VariableFont_opsz\,wght.ttf');
 
-    body {
-      background-color: black;
-      color: white;
-      margin: 0;
-      padding: 0;
-    }
+    <meta charset="UTF-8">
 
-    .firstHeading {
-      text-align: center;
-    }
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    .video-container {
-      display: flex;
-      gap: 10px;
-      width: 100%;
-      height: 100vh;
-    }
+    <title>Sentinel RC Aircraft Test</title>
 
-    .video-box {
-      position: relative;
-      /* Make this a positioning container */
-      flex: 1;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      height: 100%;
-    }
 
-    .video-box img.stream {
-      display: block;
-      -webkit-user-select: none;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    <style>
 
-    .gamepad-icon {
-      position: absolute;
-      /* Absolute positioning within video-box */
-      top: 20px;
-      left: 30px;
-      width: 45px;
-      height: auto;
-      display: none;
-    }
+        @import url('/resources/BigShouldersStencil-VariableFont_opsz\,wght.ttf');
 
-    .hud {
-      position: absolute;
-      /* Absolute positioning within video-box */
-      top: 30px;
-      /* Adjusted from 8rem to match gamepad-icon positioning */
-      left: 30px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 5px 5px;
-      border-radius: 8px;
-      font-family: "Big Shoulders Stencil", sans-serif;
-      font-optical-sizing: auto;
-      font-style: normal;
-      /*font-size: 24px;*/
-      /*font-weight: bold;*/
-      text-align: center;
-    }
-  </style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            background: black;
+
+            color: white;
+
+            margin: 0;
+
+            padding: 0;
+
+            font-family:
+                "Big Shoulders Stencil",
+                sans-serif;
+
+        }
+
+
+        .page {
+
+            min-height: 100vh;
+
+            padding: 15px;
+
+        }
+
+
+        .video-container {
+
+            display: flex;
+
+            gap: 10px;
+
+            width: 100%;
+
+            height: 55vh;
+
+        }
+
+
+        .video-box {
+
+            position: relative;
+
+            flex: 1;
+
+            background: #111;
+
+            overflow: hidden;
+
+        }
+
+
+        .video-box img.stream {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+        }
+
+
+        .gamepad-icon {
+
+            position: absolute;
+
+            z-index: 5;
+
+            top: 20px;
+
+            left: 30px;
+
+            width: 45px;
+
+            height: auto;
+
+            display: none;
+
+        }
+
+
+        .hud {
+
+            position: absolute;
+
+            z-index: 10;
+
+            top: 20px;
+
+            left: 20px;
+
+            background: rgba(0, 0, 0, 0.75);
+
+            padding: 12px;
+
+            border-radius: 8px;
+
+            min-width: 200px;
+
+            font-size: 18px;
+
+        }
+
+
+        .hud-title {
+
+            font-size: 25px;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .status-safe {
+
+            color: limegreen;
+
+        }
+
+
+        .status-danger {
+
+            color: red;
+
+        }
+
+
+        .controls {
+
+            margin: 15px auto;
+
+            max-width: 900px;
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+
+        }
+
+
+        .control {
+
+            background: #151515;
+
+            border: 1px solid #444;
+
+            border-radius: 8px;
+
+            padding: 12px;
+
+            text-align: center;
+
+        }
+
+
+        .control-name {
+
+            font-size: 18px;
+
+        }
+
+
+        .control-value {
+
+            font-size: 30px;
+
+            margin-top: 5px;
+
+        }
+
+
+        .instructions {
+
+            max-width: 900px;
+
+            margin: 20px auto;
+
+            background: #101010;
+
+            border: 1px solid #333;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            font-family: Arial, sans-serif;
+
+            line-height: 1.6;
+
+        }
+
+
+        .kill {
+
+            color: red;
+
+            font-weight: bold;
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .video-container {
+
+                height: 40vh;
+
+            }
+
+
+            .controls {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+            }
+
+        }
+
+    </style>
 
 </head>
 
+
 <body>
-  <div class="video-container">
-    <div class="video-box">
-      <div class="hud">
-        <span class="status" id="status">LAND</span><br>
-        <span class="battery" id="battery">Battery: --V</span>
-      </div>
-      <img class="gamepad-icon" src="../resources/gamePad4Connected.svg" alt="Gamepad Connected">
-      <img class="stream" src="http://10.8.0.3:8080/?action=stream" width="464" height="480">
+
+
+<div class="page">
+
+
+    <!-- =====================================================
+         CAMERA DISPLAY
+         ===================================================== -->
+
+    <div class="video-container">
+
+
+        <div class="video-box">
+
+
+            <div class="hud">
+
+                <div class="hud-title">
+                    SENTINEL
+                </div>
+
+
+                <div>
+                    MOTOR:
+                    <span
+                        id="motorStatus"
+                        class="status-danger"
+                    >
+                        KILLED
+                    </span>
+                </div>
+
+
+                <div>
+                    THROTTLE:
+                    <span id="throttle">
+                        0%
+                    </span>
+                </div>
+
+
+                <div>
+                    FLAPS:
+                    <span id="flaps">
+                        UP
+                    </span>
+                </div>
+
+
+                <div>
+                    BATTERY:
+                    <span id="battery">
+                        --V
+                    </span>
+                </div>
+
+
+                <div>
+                    CONTROLLER:
+                    <span
+                        id="controller"
+                        class="status-danger"
+                    >
+                        DISCONNECTED
+                    </span>
+                </div>
+
+            </div>
+
+
+            <img
+                class="gamepad-icon"
+                src="../resources/gamePad4Connected.svg"
+                alt="Gamepad Connected"
+            >
+
+
+            <img
+                class="stream"
+                src="http://10.8.0.3:8080/?action=stream"
+                alt="FPV Camera"
+            >
+
+        </div>
+
+
+        <div class="video-box">
+
+
+            <div class="hud">
+
+                <div>
+                    YAW:
+                    <span id="yaw">
+                        0
+                    </span>
+                </div>
+
+                <div>
+                    ROLL:
+                    <span id="roll">
+                        0
+                    </span>
+                </div>
+
+                <div>
+                    PITCH:
+                    <span id="pitch">
+                        0
+                    </span>
+                </div>
+
+            </div>
+
+
+            <img
+                class="gamepad-icon"
+                src="../resources/gamePad4Connected.svg"
+                alt="Gamepad Connected"
+            >
+
+
+            <img
+                class="stream"
+                src="http://10.8.0.3:8080/?action=stream"
+                alt="FPV Camera"
+            >
+
+        </div>
+
     </div>
-    <div class="video-box">
-      <div class="hud">
-        <span class="status" id="status">LAND</span><br>
-        <span class="battery" id="battery">Battery: --V</span>
-      </div>
-      <img class="gamepad-icon" src="../resources/gamePad4Connected.svg" alt="Gamepad Connected">
-      <img class="stream" src="http://10.8.0.3:8080/?action=stream" width="464" height="480">
+
+
+    <!-- =====================================================
+         CONTROL STATUS
+         ===================================================== -->
+
+    <div class="controls">
+
+
+        <div class="control">
+
+            <div class="control-name">
+                YAW
+            </div>
+
+            <div
+                class="control-value"
+                id="yawControl"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="control">
+
+            <div class="control-name">
+                ROLL
+            </div>
+
+            <div
+                class="control-value"
+                id="rollControl"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="control">
+
+            <div class="control-name">
+                PITCH
+            </div>
+
+            <div
+                class="control-value"
+                id="pitchControl"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div class="control">
+
+            <div class="control-name">
+                THROTTLE
+            </div>
+
+            <div
+                class="control-value"
+                id="throttleControl"
+            >
+                0%
+            </div>
+
+        </div>
+
+
+        <div class="control">
+
+            <div class="control-name">
+                FLAPS
+            </div>
+
+            <div
+                class="control-value"
+                id="flapsControl"
+            >
+                UP
+            </div>
+
+        </div>
+
+
+        <div class="control">
+
+            <div class="control-name">
+                MOTOR
+            </div>
+
+            <div
+                class="control-value"
+                id="motorControl"
+            >
+                KILLED
+            </div>
+
+        </div>
+
     </div>
-  </div>
-
-  <div style="margin:auto;">
-    <h1 class="firstHeading">TEST PAGE FOR GOOGLE CARDBOARD!</h1>
-  </div>
 
 
-  <script>
+    <!-- =====================================================
+         CONTROLLER INSTRUCTIONS
+         ===================================================== -->
 
-    let gamepadIndex = null;
-    let bButtonState = false;
+    <div class="instructions">
 
-    const normalizeJoystickValue = (value) => Math.abs(value) > 0.2 ? Math.round((value + 1) * 50) : 50;
+        <strong>Xbox Controller</strong>
+        <br><br>
 
-    const sendToServer = (data) => {
-      fetch('/joystick', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.bButtonState !== undefined) {
-            bButtonState = data.bButtonState;
-            updateHUD();
-          }
-        })
-        .catch(error => console.error('Error sending data:', error));
-    };
+        Left stick ← → : YAW
+        <br>
 
-    /*
-    const updateHUD = () => {
-      const statusElement = document.getElementById("status");
-      if (statusElement) {
-        statusElement.textContent = bButtonState ? "FLY" : "LAND";
-        statusElement.style.color = bButtonState ? "red" : "limegreen";
-      }
-    };
-    */
+        Right stick ← → : ROLL
+        <br>
 
-    // Update the JavaScript to handle multiple HUD elements
-    const updateHUD = () => {
-      const statusElements = document.querySelectorAll(".status");
-      const batteryElements = document.querySelectorAll(".battery");
+        Right stick ↑ ↓ : PITCH
+        <br><br>
 
-      statusElements.forEach(statusElement => {
-        statusElement.textContent = bButtonState ? "FLY" : "LAND";
-        statusElement.style.color = bButtonState ? "red" : "limegreen";
-      });
-    };
+        D-pad UP : THROTTLE +5%
+        <br>
+
+        D-pad DOWN : THROTTLE -5%
+        <br><br>
+
+        Y : FLAPS UP / DOWN
+        <br>
+
+        <span class="kill">
+            B : MOTOR KILL
+        </span>
+
+        <br>
+
+        A : ARM / RESET MOTOR KILL
+
+        <br><br>
+
+        <strong>Safety:</strong>
+
+        B immediately forces the ESC
+        to 1000 µs.
+
+        A clears the motor kill but
+        leaves throttle at 0%.
+
+        Controller communication loss
+        activates the failsafe.
+
+    </div>
 
 
-    const updateGamepadIcon = (leftActive, rightActive) => {
-      document.querySelectorAll('.gamepad-icon').forEach(icon => {
-        if (leftActive && rightActive) {
-          icon.src = "../resources/gamePad4_leftAndRight.svg";
-        } else if (leftActive) {
-          icon.src = "../resources/gamePad4_left.svg";
-        } else if (rightActive) {
-          icon.src = "../resources/gamePad4_right.svg";
-        } else {
-          icon.src = "../resources/gamePad4Connected.svg";
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script>
+
+
+// ============================================================
+// GAMEPAD STATE
+// ============================================================
+
+let gamepadIndex = null;
+
+
+let previousButtons = {
+
+    a: false,
+
+    b: false,
+
+    y: false,
+
+    dpadUp: false,
+
+    dpadDown: false
+
+};
+
+
+let controllerConnected = false;
+
+
+// ============================================================
+// SEND DATA TO RASPBERRY PI
+// ============================================================
+
+const sendToServer = (data) => {
+
+    fetch(
+        '/joystick',
+        {
+            method: 'POST',
+
+            headers: {
+                'Content-Type':
+                    'application/json'
+            },
+
+            body:
+                JSON.stringify(data)
+
         }
-      });
-    };
+    )
 
-    const previousButtonStates = { a: false, b: false };
+    .then(response =>
+        response.json()
+    )
 
-    const pollGamepad = () => {
-      const gamepads = navigator.getGamepads();
-      const gamepad = gamepads[gamepadIndex];
-      if (!gamepad) return;
+    .then(data => {
 
-      const leftStickX = gamepad.axes[0];
-      const leftStickY = gamepad.axes[1];
-      const rightStickX = gamepad.axes[2];
-      const rightStickY = gamepad.axes[3];
+        if (
+            data.throttlePercent !==
+            undefined
+        ) {
 
-      const leftActive = Math.abs(leftStickX) > 0.2 || Math.abs(leftStickY) > 0.2;
-      const rightActive = Math.abs(rightStickX) > 0.2 || Math.abs(rightStickY) > 0.2;
+            updateThrottle(
+                data.throttlePercent
+            );
 
-      updateGamepadIcon(leftActive, rightActive);
+        }
 
-      const leftStick = { x: normalizeJoystickValue(leftStickX), y: normalizeJoystickValue(leftStickY) };
-      const rightStick = { x: normalizeJoystickValue(rightStickX), y: normalizeJoystickValue(rightStickY) };
-      const buttons = {
-        a: gamepad.buttons[0].pressed,
-        b: gamepad.buttons[1].pressed && !previousButtonStates.b,
-      };
 
-      previousButtonStates.a = gamepad.buttons[0].pressed;
-      previousButtonStates.b = gamepad.buttons[1].pressed;
+        if (
+            data.flapsDeployed !==
+            undefined
+        ) {
 
-      sendToServer({ leftStick, rightStick, buttons });
-    };
+            updateFlaps(
+                data.flapsDeployed
+            );
 
-    const startPolling = () => setInterval(pollGamepad, 100);
+        }
 
-    const checkGamepadConnection = () => {
-      const gamepads = navigator.getGamepads();
-      const isAnyGamepadConnected = Array.from(gamepads).some(gp => gp);
-      document.querySelectorAll('.gamepad-icon').forEach(icon => {
-        icon.style.display = isAnyGamepadConnected ? 'block' : 'none';
-      });
-      if (isAnyGamepadConnected) updateGamepadIcon(false, false);
-    };
 
-    window.addEventListener('gamepadconnected', (event) => {
-      console.log('Gamepad connected:', event.gamepad);
-      gamepadIndex = event.gamepad.index;
-      checkGamepadConnection();
-      startPolling();
+        if (
+            data.motorKilled !==
+            undefined
+        ) {
+
+            updateMotor(
+                data.motorKilled
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            'Controller communication error:',
+            error
+        );
+
     });
 
-    window.addEventListener('gamepaddisconnected', () => {
-      console.log('Gamepad disconnected');
-      gamepadIndex = null;
-      checkGamepadConnection();
+};
+
+
+// ============================================================
+// STICK CONVERSION
+// Browser: -1...+1
+// Server:  -100...+100
+// ============================================================
+
+const axisToPercent = (value) => {
+
+    // Dead zone
+    if (Math.abs(value) < 0.08) {
+
+        return 0;
+
+    }
+
+    return Math.round(
+        value * 100
+    );
+
+};
+
+
+// ============================================================
+// HUD
+// ============================================================
+
+function updateThrottle(value) {
+
+    document.getElementById(
+        'throttle'
+    ).textContent = `${value}%`;
+
+    document.getElementById(
+        'throttleControl'
+    ).textContent = `${value}%`;
+
+}
+
+
+function updateFlaps(deployed) {
+
+    const text =
+        deployed
+            ? 'DOWN'
+            : 'UP';
+
+    document.getElementById(
+        'flaps'
+    ).textContent = text;
+
+    document.getElementById(
+        'flapsControl'
+    ).textContent = text;
+
+}
+
+
+function updateMotor(killed) {
+
+    const status =
+        document.getElementById(
+            'motorStatus'
+        );
+
+    const control =
+        document.getElementById(
+            'motorControl'
+        );
+
+
+    status.textContent =
+        killed
+            ? 'KILLED'
+            : 'ARMED';
+
+
+    control.textContent =
+        killed
+            ? 'KILLED'
+            : 'ARMED';
+
+
+    status.className =
+        killed
+            ? 'status-danger'
+            : 'status-safe';
+
+}
+
+
+function updateController(connected) {
+
+    const element =
+        document.getElementById(
+            'controller'
+        );
+
+
+    element.textContent =
+        connected
+            ? 'CONNECTED'
+            : 'DISCONNECTED';
+
+
+    element.className =
+        connected
+            ? 'status-safe'
+            : 'status-danger';
+
+}
+
+
+function updateAxisDisplay(
+    name,
+    value
+) {
+
+    document.getElementById(
+        name
+    ).textContent = value;
+
+
+    document.getElementById(
+        `${name}Control`
+    ).textContent = value;
+
+}
+
+
+// ============================================================
+// GAMEPAD POLLING
+// ============================================================
+
+function pollGamepad() {
+
+    if (gamepadIndex === null) {
+
+        return;
+
+    }
+
+
+    const gamepads =
+        navigator.getGamepads();
+
+
+    const gamepad =
+        gamepads[gamepadIndex];
+
+
+    if (!gamepad) {
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // XBOX AXES
+    //
+    // 0 = Left X
+    // 1 = Left Y
+    // 2 = Right X
+    // 3 = Right Y
+    // ========================================================
+
+    const yaw =
+        axisToPercent(
+            gamepad.axes[0]
+        );
+
+
+    const roll =
+        axisToPercent(
+            gamepad.axes[2]
+        );
+
+
+    // Browser Y is positive downward,
+    // so invert it for pitch.
+    const pitch =
+        axisToPercent(
+            -gamepad.axes[3]
+        );
+
+
+    updateAxisDisplay(
+        'yaw',
+        yaw
+    );
+
+
+    updateAxisDisplay(
+        'roll',
+        roll
+    );
+
+
+    updateAxisDisplay(
+        'pitch',
+        pitch
+    );
+
+
+    // ========================================================
+    // XBOX BUTTONS
+    //
+    // A = 0
+    // B = 1
+    // X = 2
+    // Y = 3
+    //
+    // D-PAD:
+    // UP    = 12
+    // DOWN  = 13
+    // LEFT  = 14
+    // RIGHT = 15
+    // ========================================================
+
+    const aPressed =
+        !!gamepad.buttons[0]?.pressed;
+
+
+    const bPressed =
+        !!gamepad.buttons[1]?.pressed;
+
+
+    const yPressed =
+        !!gamepad.buttons[3]?.pressed;
+
+
+    const dpadUpPressed =
+        !!gamepad.buttons[12]?.pressed;
+
+
+    const dpadDownPressed =
+        !!gamepad.buttons[13]?.pressed;
+
+
+    // ========================================================
+    // BUTTON EDGE DETECTION
+    //
+    // We only send a button command once when it is pressed.
+    // ========================================================
+
+    const aPressedEdge =
+        aPressed &&
+        !previousButtons.a;
+
+
+    const bPressedEdge =
+        bPressed &&
+        !previousButtons.b;
+
+
+    const yPressedEdge =
+        yPressed &&
+        !previousButtons.y;
+
+
+    const dpadUpEdge =
+        dpadUpPressed &&
+        !previousButtons.dpadUp;
+
+
+    const dpadDownEdge =
+        dpadDownPressed &&
+        !previousButtons.dpadDown;
+
+
+    // ========================================================
+    // SEND AIRCRAFT COMMAND
+    // ========================================================
+
+    sendToServer({
+
+        yaw,
+
+        roll,
+
+        pitch,
+
+        throttleUp:
+            dpadUpEdge,
+
+        throttleDown:
+            dpadDownEdge,
+
+        flapsToggle:
+            yPressedEdge,
+
+        motorKill:
+            bPressedEdge,
+
+        arm:
+            aPressedEdge
+
     });
 
-    window.addEventListener('load', () => {
-      checkGamepadConnection();
-      updateHUD();
-    });
 
-  </script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io("http://10.8.0.3");
-    socket.on('connect', () => console.log('Socket.IO connected'));
-    socket.on('connect_error', (err) => console.error('Socket.IO error:', err));
-    socket.on('disconnect', () => console.log('Socket.IO disconnected'));
-    /*
-    socket.on('batteryVoltage', (voltage) => {
-      console.log('Received voltage:', voltage);
-      const batteryElement = document.getElementById("battery");
-      //const batteryElement = document.querySelectorAll(".battery");
-      if (batteryElement) {
-        batteryElement.textContent = `Battery: ${voltage}V`;
-      }
-    });
-    */
-    // Update battery voltage handler
-    socket.on('batteryVoltage', (voltage) => {
-      console.log('Received voltage:', voltage);
-      const batteryElements = document.querySelectorAll(".battery");
-      batteryElements.forEach(batteryElement => {
-        batteryElement.textContent = `Battery: ${voltage}V`;
-      });
-    });
+    // Save button state.
+    previousButtons.a =
+        aPressed;
+
+    previousButtons.b =
+        bPressed;
+
+    previousButtons.y =
+        yPressed;
+
+    previousButtons.dpadUp =
+        dpadUpPressed;
+
+    previousButtons.dpadDown =
+        dpadDownPressed;
+
+}
 
 
-    console.log('Socket status:', socket);
+// ============================================================
+// FIND CONTROLLER
+// ============================================================
 
-  </script>
+function checkGamepadConnection() {
+
+    const gamepads =
+        navigator.getGamepads();
+
+
+    let found = false;
+
+
+    for (
+        let i = 0;
+        i < gamepads.length;
+        i++
+    ) {
+
+        if (gamepads[i]) {
+
+            gamepadIndex = i;
+
+            found = true;
+
+            break;
+
+        }
+
+    }
+
+
+    controllerConnected =
+        found;
+
+
+    updateController(
+        found
+    );
+
+
+    document
+        .querySelectorAll(
+            '.gamepad-icon'
+        )
+        .forEach(icon => {
+
+            icon.style.display =
+                found
+                    ? 'block'
+                    : 'none';
+
+        });
+
+}
+
+
+// ============================================================
+// CONTROLLER CONNECTED
+// ============================================================
+
+window.addEventListener(
+    'gamepadconnected',
+    (event) => {
+
+        console.log(
+            'Gamepad connected:',
+            event.gamepad
+        );
+
+
+        gamepadIndex =
+            event.gamepad.index;
+
+
+        controllerConnected =
+            true;
+
+
+        updateController(
+            true
+        );
+
+
+        checkGamepadConnection();
+
+    }
+);
+
+
+// ============================================================
+// CONTROLLER DISCONNECTED
+// ============================================================
+
+window.addEventListener(
+    'gamepaddisconnected',
+    () => {
+
+        console.log(
+            'Gamepad disconnected'
+        );
+
+
+        gamepadIndex =
+            null;
+
+
+        controllerConnected =
+            false;
+
+
+        updateController(
+            false
+        );
+
+    }
+);
+
+
+// ============================================================
+// START GAMEPAD POLLING
+// ============================================================
+
+window.addEventListener(
+    'load',
+    () => {
+
+        checkGamepadConnection();
+
+        // 20 Hz controller update rate.
+        setInterval(
+            pollGamepad,
+            50
+        );
+
+    }
+);
+
+
+// ============================================================
+// SOCKET.IO
+// ============================================================
+
+const socket =
+    io();
+
+
+socket.on(
+    'connect',
+    () => {
+
+        console.log(
+            'Socket.IO connected'
+        );
+
+    }
+);
+
+
+socket.on(
+    'aircraftState',
+    (state) => {
+
+        updateThrottle(
+            state.throttlePercent
+        );
+
+        updateFlaps(
+            state.flapsDeployed
+        );
+
+        updateMotor(
+            state.motorKilled
+        );
+
+    }
+);
+
+
+socket.on(
+    'batteryVoltage',
+    (voltage) => {
+
+        document.getElementById(
+            'battery'
+        ).textContent =
+            `${voltage}V`;
+
+    }
+);
+
+
+socket.on(
+    'disconnect',
+    () => {
+
+        console.log(
+            'Socket.IO disconnected'
+        );
+
+    }
+);
+
+
+</script>
+
+
 </body>
 
 </html>
