@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sentinel FPV</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+    }
+
+    .firstHeading {
+      text-align: center;
+    }
+
+    .video-container {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .video-box {
+      position: relative;
+      flex: 1;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100%;
+    }
+
+    .video-box img {
+      display: block;
+      -webkit-user-select: none;
+      margin: auto;
+    }
+
+    .gamepad-icon {
+      margin-top:5rem;
+      /* position: absolute; */
+      /* top: 15px; */
+      /* left: 15px; */
+      width: 45px;
+      height: auto;
+      display: none;
+    }
+
+    .hud {
+      margin-top:5rem;
+     
+      /*position: absolute; */
+      /*top: 8rem; */
+      /*left: 5rem; */
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+  <script>
+    let gamepadIndex = null;
+    let bButtonState = false;
+
+    const normalizeJoystickValue = (value) => Math.abs(value) > 0.2 ? Math.round((value + 1) * 50) : 50;
+
+    const sendToServer = (data) => {
+      fetch('/joystick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.bButtonState !== undefined) {
+            bButtonState = data.bButtonState;
+            updateHUD();
+          }
+        })
+        .catch(error => console.error('Error sending data:', error));
+    };
+
+    const updateHUD = () => {
+      const statusElement = document.getElementById("status");
+      if (statusElement) {
+        statusElement.textContent = bButtonState ? "FLY" : "LAND";
+        statusElement.style.color = bButtonState ? "red" : "limegreen";
+      }
+    };
+
+    const updateGamepadIcon = (leftActive, rightActive) => {
+      document.querySelectorAll('.gamepad-icon').forEach(icon => {
+        if (leftActive && rightActive) {
+          icon.src = "../resources/gamePad4_leftAndRight.svg";
+        } else if (leftActive) {
+          icon.src = "../resources/gamePad4_left.svg";
+        } else if (rightActive) {
+          icon.src = "../resources/gamePad4_right.svg";
+        } else {
+          icon.src = "../resources/gamePad4Connected.svg";
+        }
+      });
+    };
+
+    const previousButtonStates = { a: false, b: false };
+
+    const pollGamepad = () => {
+      const gamepads = navigator.getGamepads();
+      const gamepad = gamepads[gamepadIndex];
+      if (!gamepad) return;
+
+      const leftStickX = gamepad.axes[0];
+      const leftStickY = gamepad.axes[1];
+      const rightStickX = gamepad.axes[2];
+      const rightStickY = gamepad.axes[3];
+
+      const leftActive = Math.abs(leftStickX) > 0.2 || Math.abs(leftStickY) > 0.2;
+      const rightActive = Math.abs(rightStickX) > 0.2 || Math.abs(rightStickY) > 0.2;
+
+      updateGamepadIcon(leftActive, rightActive);
+
+      const leftStick = { x: normalizeJoystickValue(leftStickX), y: normalizeJoystickValue(leftStickY) };
+      const rightStick = { x: normalizeJoystickValue(rightStickX), y: normalizeJoystickValue(rightStickY) };
+      const buttons = {
+        a: gamepad.buttons[0].pressed,
+        b: gamepad.buttons[1].pressed && !previousButtonStates.b,
+      };
+
+      previousButtonStates.a = gamepad.buttons[0].pressed;
+      previousButtonStates.b = gamepad.buttons[1].pressed;
+
+      sendToServer({ leftStick, rightStick, buttons });
+    };
+
+    const startPolling = () => setInterval(pollGamepad, 100);
+
+    const checkGamepadConnection = () => {
+      const gamepads = navigator.getGamepads();
+      const isAnyGamepadConnected = Array.from(gamepads).some(gp => gp);
+      document.querySelectorAll('.gamepad-icon').forEach(icon => {
+        icon.style.display = isAnyGamepadConnected ? 'block' : 'none';
+      });
+      if (isAnyGamepadConnected) updateGamepadIcon(false, false);
+    };
+
+    window.addEventListener('gamepadconnected', (event) => {
+      console.log('Gamepad connected:', event.gamepad);
+      gamepadIndex = event.gamepad.index;
+      checkGamepadConnection();
+      startPolling();
+    });
+
+    window.addEventListener('gamepaddisconnected', () => {
+      console.log('Gamepad disconnected');
+      gamepadIndex = null;
+      checkGamepadConnection();
+    });
+
+    window.addEventListener('load', () => {
+      checkGamepadConnection();
+      updateHUD();
+    });
+  </script>
+</head>
+
+<body>
+  <div class="video-container">
+    <div class="video-box">
+      <div id="hud" class="hud">
+        <span id="status">LAND</span><br>
+        <span id="battery">Battery: --V</span>
+      </div>
+      <img class="gamepad-icon" src="../resources/gamePad4Connected.svg" alt="Gamepad Connected">
+      <img src="http://10.8.0.3:8080/?action=stream" width="464" height="480">
+    </div>
+    <div class="video-box">
+      <div id="hud" class="hud">
+        <span id="status">LAND</span><br>
+        <span id="battery">Battery: --V</span>
+      </div>
+      <img class="gamepad-icon" src="../resources/gamePad4Connected.svg" alt="Gamepad Connected">
+      <img src="http://10.8.0.3:8080/?action=stream" width="464" height="480">
+    </div>
+  </div>
+
+  <!--
+  <div id="hud" class="hud">
+    <span id="status">LAND</span><br>
+    <span id="battery">Battery: --V</span>
+  </div>  
+-->
+
+  <div style="margin:auto;">
+    <h1 class="firstHeading">TEST PAGE FOR GOOGLE CARDBOARD!</h1>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io("http://10.8.0.3");
+    socket.on('connect', () => console.log('Socket.IO connected'));
+    socket.on('connect_error', (err) => console.error('Socket.IO error:', err));
+    socket.on('disconnect', () => console.log('Socket.IO disconnected'));
+    socket.on('batteryVoltage', (voltage) => {
+      console.log('Received voltage:', voltage);
+      const batteryElement = document.getElementById("battery");
+      if (batteryElement) {
+        batteryElement.textContent = `Battery: ${voltage}V`;
+      }
+    });
+    console.log('Socket status:', socket);
+  </script>
+</body>
+
+</html>
