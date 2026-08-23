@@ -525,51 +525,62 @@ setInterval(() => {
 
 }, 100);
 
-
 // ============================================================
 // SERIAL BATTERY VOLTAGE
 // ============================================================
 
 const port = new SerialPort({
-
     path: '/dev/ttyUSB0',
-
     baudRate: 9600
-
 });
 
-const parser =
-    new ReadlineParser();
-
-port.pipe(parser);
-
+const parser = port.pipe(
+    new ReadlineParser({
+        delimiter: '\r\n'
+    })
+);
 
 parser.on('data', (data) => {
 
-    const trimmedData =
-        data.trim();
+    const line = data.trim();
 
-    const cleanVoltage =
-        trimmedData.replace(
-            /[^0-9.]/g,
-            ''
+    console.log('SERIAL RAW:', JSON.stringify(line));
+
+    const match = line.match(
+        /Battery Voltage:\s*([\d.]+)/
+    );
+
+    if (!match) {
+        return;
+    }
+
+    const voltage = parseFloat(match[1]);
+
+    if (!Number.isNaN(voltage)) {
+
+        console.log(
+            'BATTERY:',
+            voltage.toFixed(2),
+            'V'
         );
-
-    const voltage =
-        parseFloat(cleanVoltage);
-
-    if (!isNaN(voltage)) {
 
         io.emit(
             'batteryVoltage',
-            cleanVoltage
+            voltage.toFixed(2)
         );
 
     }
 
 });
 
+port.on('error', (error) => {
 
+    console.error(
+        'SERIAL ERROR:',
+        error.message
+    );
+
+});
 // ============================================================
 // START SERVER
 // ============================================================
@@ -580,7 +591,7 @@ httpServer.listen(
     () => {
 
         console.log(
-            'Sentinel RC aircraft controller running on port 3003'
+            'Icronis RC aircraft controller running on port 3003'
         );
 
         console.log(
