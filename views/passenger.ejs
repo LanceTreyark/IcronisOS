@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <title>SENTINEL PASSENGER</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        html,
+        body {
+
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            background: #000;
+
+        }
+
+
+        body {
+
+            touch-action: manipulation;
+
+        }
+
+
+        /* =====================================================
+           PASSENGER FPV VIEW
+           ===================================================== */
+
+        .passenger {
+
+            position: fixed;
+
+            inset: 0;
+
+            width: 100vw;
+            height: 100vh;
+
+            display: flex;
+
+            background: #000;
+
+        }
+
+
+        /* =====================================================
+           LEFT / RIGHT EYES
+           ===================================================== */
+
+        .eye {
+
+            position: relative;
+
+            width: 50vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: #000;
+
+        }
+
+
+        .stream {
+
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+
+        }
+
+
+        /* =====================================================
+           CENTER DIVIDER
+           ===================================================== */
+
+        .center-line {
+
+            position: absolute;
+
+            z-index: 10;
+
+            top: 0;
+            bottom: 0;
+
+            left: 50%;
+
+            width: 3px;
+
+            transform:
+                translateX(-50%);
+
+            background: #000;
+
+            pointer-events: none;
+
+        }
+
+
+        /* =====================================================
+           PORTRAIT WARNING
+           ===================================================== */
+
+        .orientation-warning {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 100;
+
+            inset: 0;
+
+            background: #000;
+
+            color: white;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 30px;
+
+            font-family: Arial, sans-serif;
+
+            font-size: 24px;
+
+        }
+
+
+        /* =====================================================
+           PORTRAIT MODE
+           ===================================================== */
+
+        @media (orientation: portrait) {
+
+            .passenger {
+
+                display: none;
+
+            }
+
+
+            .orientation-warning {
+
+                display: flex;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     PORTRAIT WARNING
+     ========================================================= -->
+
+<div class="orientation-warning">
+
+    ROTATE PHONE
+
+    <br>
+    <br>
+
+    LANDSCAPE PASSENGER MODE
+
+</div>
+
+
+<!-- =========================================================
+     PASSENGER DISPLAY
+     ========================================================= -->
+
+<div class="passenger">
+
+
+    <!-- =====================================================
+         LEFT EYE
+         ===================================================== -->
+
+    <div class="eye">
+
+        <img
+            class="stream"
+            src="http://192.168.1.72:8090/?action=stream"
+            alt="FPV Camera"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         RIGHT EYE
+         ===================================================== -->
+
+    <div class="eye">
+
+        <img
+            class="stream"
+            src="http://192.168.1.72:8090/?action=stream"
+            alt="FPV Camera"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         CENTER DIVIDER
+         ===================================================== -->
+
+    <div class="center-line"></div>
+
+
+</div>
+
+
+<script>
+
+
+// ============================================================
+// TAP FOR FULLSCREEN
+// ============================================================
+
+function enterFullscreen() {
+
+    const element =
+        document.documentElement;
+
+
+    if (
+        !document.fullscreenElement &&
+        element.requestFullscreen
+    ) {
+
+        element
+            .requestFullscreen()
+            .catch(() => {});
+
+    }
+
+}
+
+
+document.addEventListener(
+    'click',
+    enterFullscreen
+);
+
+
+</script>
+
+
+</body>
+
+</html>

@@ -577,17 +577,7 @@
         }
 
 
-        /* =====================================================
-           HIDE HUD
-           ===================================================== */
 
-        .hud-hidden {
-
-            opacity: 0;
-
-            pointer-events: none;
-
-        }
 
     </style>
 
@@ -1432,73 +1422,6 @@ window.addEventListener(
     }
 );
 
-
-// ============================================================
-// HIDE HUD AFTER INACTIVITY
-// ============================================================
-
-let hudTimer;
-
-
-function resetHudTimer() {
-
-    clearTimeout(
-        hudTimer
-    );
-
-
-    document
-        .querySelectorAll(
-            '.hud, .flight-hud, .battery'
-        )
-        .forEach(element => {
-
-            element.classList.remove(
-                'hud-hidden'
-            );
-
-        });
-
-
-    hudTimer =
-        setTimeout(
-            () => {
-
-                document
-                    .querySelectorAll(
-                        '.hud, .flight-hud, .battery'
-                    )
-                    .forEach(element => {
-
-                        element.classList.add(
-                            'hud-hidden'
-                        );
-
-                    });
-
-            },
-            5000
-        );
-
-}
-
-
-document.addEventListener(
-    'click',
-    resetHudTimer
-);
-
-
-document.addEventListener(
-    'touchstart',
-    resetHudTimer,
-    {
-        passive: true
-    }
-);
-
-
-resetHudTimer();
 
 
 </script>

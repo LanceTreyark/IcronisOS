@@ -98,14 +98,38 @@ echo ">>> Configuring bash aliases..."
 
 touch "$HOME/.bash_aliases"
 
+
+# btop
 grep -qxF 'alias bb="btop"' "$HOME/.bash_aliases" || \
     echo 'alias bb="btop"' >> "$HOME/.bash_aliases"
 
+
+# Reload aliases
 grep -qxF 'alias realias="source ~/.bash_aliases"' "$HOME/.bash_aliases" || \
     echo 'alias realias="source ~/.bash_aliases"' >> "$HOME/.bash_aliases"
 
+
+# Icronis directory
 grep -qxF 'alias icronis="cd /var/www/html/IcronisOS"' "$HOME/.bash_aliases" || \
     echo 'alias icronis="cd /var/www/html/IcronisOS"' >> "$HOME/.bash_aliases"
+
+
+# Start Icronis + MJPG Streamer
+grep -qxF 'alias starticronis='\''cd /var/www/html/IcronisOS && (sudo pm2 restart icronis 2>/dev/null || sudo pm2 start icronis-os.js --name icronis) && cd ~/mjpg-streamer/mjpg-streamer-experimental && nohup mjpg_streamer -i "input_uvc.so" -o "output_http.so -p 8090 -w ./www" >/tmp/mjpg-streamer.log 2>&1 &'\''' "$HOME/.bash_aliases" || \
+    echo 'alias starticronis='\''cd /var/www/html/IcronisOS && (sudo pm2 restart icronis 2>/dev/null || sudo pm2 start icronis-os.js --name icronis) && cd ~/mjpg-streamer/mjpg-streamer-experimental && nohup mjpg_streamer -i "input_uvc.so" -o "output_http.so -p 8090 -w ./www" >/tmp/mjpg-streamer.log 2>&1 &'\''' >> "$HOME/.bash_aliases"
+
+
+# Stop Icronis + MJPG Streamer
+grep -qxF "alias stopicronis='sudo pm2 stop icronis; pkill -f mjpg_streamer'" "$HOME/.bash_aliases" || \
+    echo "alias stopicronis='sudo pm2 stop icronis; pkill -f mjpg_streamer'" >> "$HOME/.bash_aliases"
+
+
+# Status
+grep -qxF "alias statusicronis='sudo pm2 status; echo \"--- MJPG STREAMER ---\"; pgrep -a mjpg_streamer'" "$HOME/.bash_aliases" || \
+    echo "alias statusicronis='sudo pm2 status; echo \"--- MJPG STREAMER ---\"; pgrep -a mjpg_streamer'" >> "$HOME/.bash_aliases"
+
+
+echo ">>> Bash aliases configured."
 
 # ------------------------------------------------------------
 # Apache
