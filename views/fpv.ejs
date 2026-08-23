@@ -1,0 +1,1510 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <title>SENTINEL FPV</title>
+
+
+    <style>
+
+        @import url('/resources/BigShouldersStencil-VariableFont_opsz\,wght.ttf');
+
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        html,
+        body {
+
+            width: 100%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+
+            overflow: hidden;
+
+            background: #000;
+
+            color: white;
+
+            font-family:
+                "Big Shoulders Stencil",
+                sans-serif;
+
+        }
+
+
+        body {
+
+            touch-action: manipulation;
+
+        }
+
+
+        /* =====================================================
+           FPV VIEW
+           ===================================================== */
+
+        .fpv {
+
+            position: fixed;
+
+            inset: 0;
+
+            width: 100vw;
+            height: 100vh;
+
+            background: #000;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+        }
+
+
+        /* =====================================================
+           TWO EYE WINDOWS
+           ===================================================== */
+
+        .eye {
+
+            position: relative;
+
+            width: 50vw;
+            height: 100vh;
+
+            overflow: hidden;
+
+            background: #000;
+
+        }
+
+
+        .eye img.stream {
+
+            position: absolute;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            display: block;
+
+        }
+
+
+        /* =====================================================
+           CENTER DIVIDER
+           ===================================================== */
+
+        .center-line {
+
+            position: absolute;
+
+            z-index: 50;
+
+            top: 0;
+            bottom: 0;
+
+            left: 50%;
+
+            width: 3px;
+
+            transform:
+                translateX(-50%);
+
+            background: rgba(
+                0,
+                0,
+                0,
+                0.9
+            );
+
+            pointer-events: none;
+
+        }
+
+
+        /* =====================================================
+           HUD
+           ===================================================== */
+
+        .hud {
+
+            position: absolute;
+
+            z-index: 20;
+
+            top: 18px;
+            left: 18px;
+
+            padding: 8px 12px;
+
+            min-width: 150px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            border-left:
+                3px solid white;
+
+            border-radius: 3px;
+
+            font-family:
+                "Big Shoulders Stencil",
+                sans-serif;
+
+            font-size: 16px;
+
+            line-height: 1.25;
+
+            text-shadow:
+                0 1px 3px black;
+
+            transition:
+                opacity 0.4s ease;
+
+        }
+
+
+        .hud-title {
+
+            font-size: 25px;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .hud-row {
+
+            white-space: nowrap;
+
+        }
+
+
+        .status-safe {
+
+            color: #00ff66;
+
+        }
+
+
+        .status-danger {
+
+            color: #ff3030;
+
+        }
+
+
+        /* =====================================================
+           RIGHT EYE FLIGHT DATA
+           ===================================================== */
+
+        .flight-hud {
+
+            position: absolute;
+
+            z-index: 20;
+
+            top: 18px;
+            right: 18px;
+
+            padding: 8px 12px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            border-right:
+                3px solid white;
+
+            border-radius: 3px;
+
+            text-align: right;
+
+            font-size: 16px;
+
+            line-height: 1.3;
+
+            text-shadow:
+                0 1px 3px black;
+
+            transition:
+                opacity 0.4s ease;
+
+        }
+
+
+        /* =====================================================
+           CENTER RETICLE
+           ===================================================== */
+
+        .reticle {
+
+            position: absolute;
+
+            z-index: 30;
+
+            left: 50%;
+            top: 50%;
+
+            width: 30px;
+            height: 30px;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                );
+
+            pointer-events: none;
+
+            opacity: 0.75;
+
+        }
+
+
+        .reticle::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 14px;
+            top: 0;
+
+            width: 2px;
+            height: 30px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.7
+                );
+
+        }
+
+
+        .reticle::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            top: 14px;
+
+            width: 30px;
+            height: 2px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.7
+                );
+
+        }
+
+
+        /* =====================================================
+           GAMEPAD INDICATOR
+           ===================================================== */
+
+        .gamepad-icon {
+
+            position: absolute;
+
+            z-index: 40;
+
+            bottom: 20px;
+            left: 20px;
+
+            width: 36px;
+
+            height: auto;
+
+            display: none;
+
+            opacity: 0.85;
+
+        }
+
+
+        /* =====================================================
+           BATTERY
+           ===================================================== */
+
+        .battery {
+
+            position: absolute;
+
+            z-index: 40;
+
+            bottom: 18px;
+            right: 18px;
+
+            font-size: 18px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.65
+                );
+
+            padding: 5px 10px;
+
+            border-radius: 3px;
+
+            transition:
+                opacity 0.4s ease;
+
+        }
+
+
+        /* =====================================================
+           TOUCH MESSAGE
+           ===================================================== */
+
+        .tap-message {
+
+            position: fixed;
+
+            z-index: 100;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(
+                    -50%,
+                    -50%
+                );
+
+            padding: 14px 22px;
+
+            background:
+                rgba(
+                    0,
+                    0,
+                    0,
+                    0.8
+                );
+
+            border:
+                1px solid
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.4
+                );
+
+            border-radius: 6px;
+
+            font-size: 20px;
+
+            letter-spacing: 1px;
+
+            text-align: center;
+
+            pointer-events: none;
+
+            opacity: 0;
+
+            transition:
+                opacity 0.4s ease;
+
+        }
+
+
+        .tap-message.visible {
+
+            opacity: 1;
+
+        }
+
+
+        /* =====================================================
+           LANDSCAPE WARNING
+           ===================================================== */
+
+        .orientation-warning {
+
+            display: none;
+
+            position: fixed;
+
+            z-index: 200;
+
+            inset: 0;
+
+            background: #000;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 30px;
+
+            font-size: 25px;
+
+        }
+
+
+        /* =====================================================
+           PORTRAIT
+           ===================================================== */
+
+        @media (orientation: portrait) {
+
+            .orientation-warning {
+
+                display: flex;
+
+            }
+
+            .fpv {
+
+                display: none;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SMALL PHONES
+           ===================================================== */
+
+        @media (max-height: 500px) {
+
+            .hud {
+
+                top: 8px;
+                left: 8px;
+
+                font-size: 13px;
+
+                padding: 5px 8px;
+
+            }
+
+
+            .hud-title {
+
+                font-size: 19px;
+
+            }
+
+
+            .flight-hud {
+
+                top: 8px;
+                right: 8px;
+
+                font-size: 13px;
+
+                padding: 5px 8px;
+
+            }
+
+
+            .battery {
+
+                bottom: 8px;
+                right: 8px;
+
+                font-size: 14px;
+
+            }
+
+
+            .gamepad-icon {
+
+                bottom: 8px;
+                left: 8px;
+
+                width: 28px;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           HIDE HUD
+           ===================================================== */
+
+        .hud-hidden {
+
+            opacity: 0;
+
+            pointer-events: none;
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     PORTRAIT WARNING
+     ========================================================= -->
+
+<div class="orientation-warning">
+
+    ROTATE PHONE<br><br>
+
+    LANDSCAPE FPV MODE
+
+</div>
+
+
+<!-- =========================================================
+     FPV DISPLAY
+     ========================================================= -->
+
+<div class="fpv">
+
+
+    <!-- =====================================================
+         LEFT EYE
+         ===================================================== -->
+
+    <div class="eye">
+
+
+        <img
+            class="stream"
+            src="http://192.168.1.72:8090/?action=stream"
+            alt="FPV Camera"
+        >
+
+
+        <div class="hud" id="hudLeft">
+
+            <div class="hud-title">
+                SENTINEL
+            </div>
+
+            <div class="hud-row">
+
+                MOTOR:
+
+                <span
+                    id="motorStatus"
+                    class="status-danger"
+                >
+                    KILLED
+                </span>
+
+            </div>
+
+            <div class="hud-row">
+
+                THROTTLE:
+
+                <span id="throttle">
+                    0%
+                </span>
+
+            </div>
+
+            <div class="hud-row">
+
+                FLAPS:
+
+                <span id="flaps">
+                    UP
+                </span>
+
+            </div>
+
+            <div class="hud-row">
+
+                CONTROLLER:
+
+                <span
+                    id="controller"
+                    class="status-danger"
+                >
+                    DISCONNECTED
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <img
+            class="gamepad-icon"
+            src="/resources/gamePad4Connected.svg"
+            alt="Controller"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         RIGHT EYE
+         ===================================================== -->
+
+    <div class="eye">
+
+
+        <img
+            class="stream"
+            src="http://192.168.1.72:8090/?action=stream"
+            alt="FPV Camera"
+        >
+
+
+        <div class="flight-hud" id="hudRight">
+
+            <div>
+
+                YAW:
+
+                <span id="yaw">
+                    0
+                </span>
+
+            </div>
+
+            <div>
+
+                ROLL:
+
+                <span id="roll">
+                    0
+                </span>
+
+            </div>
+
+            <div>
+
+                PITCH:
+
+                <span id="pitch">
+                    0
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CENTER DIVIDER
+         ===================================================== -->
+
+    <div class="center-line"></div>
+
+
+    <!-- =====================================================
+         RETICLE
+         ===================================================== -->
+
+    <div class="reticle"></div>
+
+
+    <!-- =====================================================
+         BATTERY
+         ===================================================== -->
+
+    <div class="battery">
+
+        BAT:
+
+        <span id="battery">
+            --V
+        </span>
+
+    </div>
+
+
+</div>
+
+
+<div
+    class="tap-message"
+    id="tapMessage"
+>
+
+    TAP FOR FULLSCREEN
+
+</div>
+
+
+<script src="/socket.io/socket.io.js"></script>
+
+
+<script>
+
+
+// ============================================================
+// GAMEPAD STATE
+// ============================================================
+
+let gamepadIndex = null;
+
+
+let previousButtons = {
+
+    a: false,
+
+    b: false,
+
+    y: false,
+
+    dpadUp: false,
+
+    dpadDown: false
+
+};
+
+
+let controllerConnected = false;
+
+
+// ============================================================
+// SEND DATA TO RASPBERRY PI
+// ============================================================
+
+const sendToServer = (data) => {
+
+    fetch(
+        '/joystick',
+        {
+            method: 'POST',
+
+            headers: {
+                'Content-Type':
+                    'application/json'
+            },
+
+            body:
+                JSON.stringify(data)
+
+        }
+    )
+
+    .then(response =>
+        response.json()
+    )
+
+    .then(data => {
+
+        if (
+            data.throttlePercent !==
+            undefined
+        ) {
+
+            updateThrottle(
+                data.throttlePercent
+            );
+
+        }
+
+
+        if (
+            data.flapsDeployed !==
+            undefined
+        ) {
+
+            updateFlaps(
+                data.flapsDeployed
+            );
+
+        }
+
+
+        if (
+            data.motorKilled !==
+            undefined
+        ) {
+
+            updateMotor(
+                data.motorKilled
+            );
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            'Controller communication error:',
+            error
+        );
+
+    });
+
+};
+
+
+// ============================================================
+// STICK CONVERSION
+// ============================================================
+
+const axisToPercent = (value) => {
+
+    if (Math.abs(value) < 0.08) {
+
+        return 0;
+
+    }
+
+    return Math.round(
+        value * 100
+    );
+
+};
+
+
+// ============================================================
+// HUD
+// ============================================================
+
+function updateThrottle(value) {
+
+    document.getElementById(
+        'throttle'
+    ).textContent = `${value}%`;
+
+}
+
+
+function updateFlaps(deployed) {
+
+    document.getElementById(
+        'flaps'
+    ).textContent =
+        deployed
+            ? 'DOWN'
+            : 'UP';
+
+}
+
+
+function updateMotor(killed) {
+
+    const status =
+        document.getElementById(
+            'motorStatus'
+        );
+
+
+    status.textContent =
+        killed
+            ? 'KILLED'
+            : 'ARMED';
+
+
+    status.className =
+        killed
+            ? 'status-danger'
+            : 'status-safe';
+
+}
+
+
+function updateController(connected) {
+
+    const element =
+        document.getElementById(
+            'controller'
+        );
+
+
+    element.textContent =
+        connected
+            ? 'CONNECTED'
+            : 'DISCONNECTED';
+
+
+    element.className =
+        connected
+            ? 'status-safe'
+            : 'status-danger';
+
+
+    document
+        .querySelectorAll(
+            '.gamepad-icon'
+        )
+        .forEach(icon => {
+
+            icon.style.display =
+                connected
+                    ? 'block'
+                    : 'none';
+
+        });
+
+}
+
+
+function updateAxisDisplay(
+    name,
+    value
+) {
+
+    document.getElementById(
+        name
+    ).textContent = value;
+
+}
+
+
+// ============================================================
+// GAMEPAD POLLING
+// ============================================================
+
+function pollGamepad() {
+
+    if (gamepadIndex === null) {
+
+        return;
+
+    }
+
+
+    const gamepads =
+        navigator.getGamepads();
+
+
+    const gamepad =
+        gamepads[gamepadIndex];
+
+
+    if (!gamepad) {
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // AXES
+    // --------------------------------------------------------
+
+    const yaw =
+        axisToPercent(
+            gamepad.axes[0]
+        );
+
+
+    const roll =
+        axisToPercent(
+            gamepad.axes[2]
+        );
+
+
+    const pitch =
+        axisToPercent(
+            -gamepad.axes[3]
+        );
+
+
+    updateAxisDisplay(
+        'yaw',
+        yaw
+    );
+
+
+    updateAxisDisplay(
+        'roll',
+        roll
+    );
+
+
+    updateAxisDisplay(
+        'pitch',
+        pitch
+    );
+
+
+    // --------------------------------------------------------
+    // BUTTONS
+    // --------------------------------------------------------
+
+    const aPressed =
+        !!gamepad.buttons[0]?.pressed;
+
+
+    const bPressed =
+        !!gamepad.buttons[1]?.pressed;
+
+
+    const yPressed =
+        !!gamepad.buttons[3]?.pressed;
+
+
+    const dpadUpPressed =
+        !!gamepad.buttons[12]?.pressed;
+
+
+    const dpadDownPressed =
+        !!gamepad.buttons[13]?.pressed;
+
+
+    // --------------------------------------------------------
+    // EDGE DETECTION
+    // --------------------------------------------------------
+
+    const aPressedEdge =
+        aPressed &&
+        !previousButtons.a;
+
+
+    const bPressedEdge =
+        bPressed &&
+        !previousButtons.b;
+
+
+    const yPressedEdge =
+        yPressed &&
+        !previousButtons.y;
+
+
+    const dpadUpEdge =
+        dpadUpPressed &&
+        !previousButtons.dpadUp;
+
+
+    const dpadDownEdge =
+        dpadDownPressed &&
+        !previousButtons.dpadDown;
+
+
+    // --------------------------------------------------------
+    // SEND COMMAND
+    // --------------------------------------------------------
+
+    sendToServer({
+
+        yaw,
+
+        roll,
+
+        pitch,
+
+        throttleUp:
+            dpadUpEdge,
+
+        throttleDown:
+            dpadDownEdge,
+
+        flapsToggle:
+            yPressedEdge,
+
+        motorKill:
+            bPressedEdge,
+
+        arm:
+            aPressedEdge
+
+    });
+
+
+    // --------------------------------------------------------
+    // SAVE BUTTON STATE
+    // --------------------------------------------------------
+
+    previousButtons.a =
+        aPressed;
+
+    previousButtons.b =
+        bPressed;
+
+    previousButtons.y =
+        yPressed;
+
+    previousButtons.dpadUp =
+        dpadUpPressed;
+
+    previousButtons.dpadDown =
+        dpadDownPressed;
+
+}
+
+
+// ============================================================
+// FIND CONTROLLER
+// ============================================================
+
+function checkGamepadConnection() {
+
+    const gamepads =
+        navigator.getGamepads();
+
+
+    let found = false;
+
+
+    for (
+        let i = 0;
+        i < gamepads.length;
+        i++
+    ) {
+
+        if (gamepads[i]) {
+
+            gamepadIndex = i;
+
+            found = true;
+
+            break;
+
+        }
+
+    }
+
+
+    controllerConnected =
+        found;
+
+
+    updateController(
+        found
+    );
+
+}
+
+
+// ============================================================
+// CONTROLLER CONNECTED
+// ============================================================
+
+window.addEventListener(
+    'gamepadconnected',
+    (event) => {
+
+        console.log(
+            'Gamepad connected:',
+            event.gamepad
+        );
+
+
+        gamepadIndex =
+            event.gamepad.index;
+
+
+        controllerConnected =
+            true;
+
+
+        updateController(
+            true
+        );
+
+    }
+);
+
+
+// ============================================================
+// CONTROLLER DISCONNECTED
+// ============================================================
+
+window.addEventListener(
+    'gamepaddisconnected',
+    () => {
+
+        console.log(
+            'Gamepad disconnected'
+        );
+
+
+        gamepadIndex =
+            null;
+
+
+        controllerConnected =
+            false;
+
+
+        updateController(
+            false
+        );
+
+    }
+);
+
+
+// ============================================================
+// SOCKET.IO
+// ============================================================
+
+const socket =
+    io();
+
+
+socket.on(
+    'connect',
+    () => {
+
+        console.log(
+            'Socket.IO connected'
+        );
+
+    }
+);
+
+
+socket.on(
+    'aircraftState',
+    (state) => {
+
+        updateThrottle(
+            state.throttlePercent
+        );
+
+
+        updateFlaps(
+            state.flapsDeployed
+        );
+
+
+        updateMotor(
+            state.motorKilled
+        );
+
+    }
+);
+
+
+socket.on(
+    'batteryVoltage',
+    (voltage) => {
+
+        document.getElementById(
+            'battery'
+        ).textContent =
+            `${voltage}V`;
+
+    }
+);
+
+
+socket.on(
+    'disconnect',
+    () => {
+
+        console.log(
+            'Socket.IO disconnected'
+        );
+
+    }
+);
+
+
+// ============================================================
+// FULLSCREEN
+// ============================================================
+
+function enterFullscreen() {
+
+    const element =
+        document.documentElement;
+
+
+    if (
+        !document.fullscreenElement &&
+        element.requestFullscreen
+    ) {
+
+        element
+            .requestFullscreen()
+            .catch(() => {});
+
+    }
+
+}
+
+
+// ============================================================
+// TAP TO FULLSCREEN
+// ============================================================
+
+document.addEventListener(
+    'click',
+    () => {
+
+        enterFullscreen();
+
+    }
+);
+
+
+// ============================================================
+// SHOW INITIAL MESSAGE
+// ============================================================
+
+window.addEventListener(
+    'load',
+    () => {
+
+        checkGamepadConnection();
+
+
+        setInterval(
+            pollGamepad,
+            50
+        );
+
+
+        const message =
+            document.getElementById(
+                'tapMessage'
+            );
+
+
+        message.classList.add(
+            'visible'
+        );
+
+
+        setTimeout(
+            () => {
+
+                message.classList.remove(
+                    'visible'
+                );
+
+            },
+            2500
+        );
+
+    }
+);
+
+
+// ============================================================
+// HIDE HUD AFTER INACTIVITY
+// ============================================================
+
+let hudTimer;
+
+
+function resetHudTimer() {
+
+    clearTimeout(
+        hudTimer
+    );
+
+
+    document
+        .querySelectorAll(
+            '.hud, .flight-hud, .battery'
+        )
+        .forEach(element => {
+
+            element.classList.remove(
+                'hud-hidden'
+            );
+
+        });
+
+
+    hudTimer =
+        setTimeout(
+            () => {
+
+                document
+                    .querySelectorAll(
+                        '.hud, .flight-hud, .battery'
+                    )
+                    .forEach(element => {
+
+                        element.classList.add(
+                            'hud-hidden'
+                        );
+
+                    });
+
+            },
+            5000
+        );
+
+}
+
+
+document.addEventListener(
+    'click',
+    resetHudTimer
+);
+
+
+document.addEventListener(
+    'touchstart',
+    resetHudTimer,
+    {
+        passive: true
+    }
+);
+
+
+resetHudTimer();
+
+
+</script>
+
+
+</body>
+
+</html>
+```
