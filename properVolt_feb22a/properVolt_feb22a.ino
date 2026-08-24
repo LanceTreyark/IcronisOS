@@ -1,6 +1,6 @@
 const int sensorPin = A0;
 
-float calibrationFactor = 3.507;
+float calibrationFactor = 3.31;
 
 void setup() {
     Serial.begin(9600);
