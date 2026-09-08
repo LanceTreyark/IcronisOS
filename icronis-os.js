@@ -37,7 +37,7 @@ const PWM_MIN = 1000;
 const PWM_CENTER = 1500;
 const PWM_MAX = 2000;
 
-const FLAPS_UP = 1000;
+const FLAPS_UP = 1500;
 const FLAPS_DOWN = 2000;
 
 const THROTTLE_STEP = 5;
@@ -405,7 +405,8 @@ app.post('/joystick', (req, res) => {
         if (typeof yaw === 'number') {
 
             servos.yaw.servoWrite(
-                axisToPwm(yaw)
+                //axisToPwm(yaw) Original is backwards, so we reverse it using the second parameter "true"
+                axisToPwm(yaw, true)
             );
 
         }
