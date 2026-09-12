@@ -428,7 +428,7 @@ app.post('/joystick', (req, res) => {
             );
 
             servos.rollRight.servoWrite(
-                PWM_CENTER -
+                PWM_CENTER +
                 (rollPwm - PWM_CENTER)
             );
 
